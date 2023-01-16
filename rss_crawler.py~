@@ -1,7 +1,0 @@
-    import xml.etree.ElementTree as ET
-    import urllib.request
-
-    url = 'https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/fe9e8b7d-61ea-409d-84aa-3ebd79a046b5.xml'
-    response = urllib.request.urlopen(url).read()
-    tree = ET.fromstring(response)
-
