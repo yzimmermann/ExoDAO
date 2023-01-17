@@ -99,8 +99,8 @@ class SearchService(rpyc.Service):
                                     "link": link,
                                     "published": published,
                                     "match": area
-                                 }
-                                 results.append(result_dict)
+                                }
+                                results.append(result_dict)
         else:
             print 'Empty Index!';
 
