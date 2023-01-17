@@ -62,35 +62,50 @@ class SearchService(rpyc.Service):
                 total = rset.GetTotalEntries()
             else:
                 total = 0
-            print "Searching for: ", query
-            print "Got = ", total, " Records"
-    # Print the results....
+            print "Searching for: ", query;
+            print "Got = ", total, " Records";
             results = []
-            for i in range(1, total+1):
-                result = rset.GetEntry(i)
-                area = pdb.Context(result, "____", "____")
-                datum = result.GetDate()
-                score = result.GetScore()
-                score  = rset.GetScaledScore(score, 100)
-                hits   = result.GetHitTable()
-                result_dict = {
-                    "result": result,
-                    "area": area,
-                    "datum": datum.RFCdate(),
-                    "score": score,
-                    "hits": pdb.Present(result, ELEMENT_Brief)
-                }
-                results.append(result_dict) 
+            for i in range(1,total+1):
+                result = rset.GetEntry(i);
+                hits   = result.GetHitTable();
+                feed_title = pdb.Present(result, "feed\\title")
+                feed_title = re.sub(' +', ' ', feed_title)
+                title_prev = ""
+                n = 1
+                for hit in hits:
+                    offset = result.GetRecordStart()
+                    fc = FC(hit[0]+offset, hit[1]+offset)
+                    lfc = pdb.GetAncestorFc (fc, "entry")
+                    area = pdb.NthContext(n, result, "___", "___")
+                    n += 1
+                    if (lfc.GetLength() > 0):
+                        fct = pdb.GetDescendentsFCT (lfc, "title")
+                        if len(fct) > 0:
+                            title =  pdb.GetPeerContent(FC(fct[0][0], fct[0][1]))
+                            title = re.sub(' +', ' ', title)
+                            if title_prev != title:
+                                link = None
+                                fct = pdb.GetDescendentsFCT (lfc, "link")
+                                if len(fct) > 0:
+                                    link = pdb.GetPeerContent(FC(fct[0][0], fct[0][1]))
+                                published = None
+                                fct = pdb.GetDescendentsFCT (lfc, "published")
+                                if len(fct) > 0:
+                                    published = pdb.GetPeerContent(FC(fct[0][0], fct[0][1]))
+                                title_prev = title
+                                result_dict = {
+                                    "logic": "RSS",
+                                    "feed_title": feed_title,
+                                    "title": title,
+                                    "link": link,
+                                    "published": published,
+                                    "match": area
+                                 }
+                                 results.append(result_dict)
         else:
-            print 'Empty Index!'
+            print 'Empty Index!';
 
         pdb = None
-        return results
-        #code that searches using the search engine in the defined index
-        if (fuzz.ratio(query,sys.argv[2])>50):
-            results=(sys.argv[2], "a very long text that nobody will ever read, because it is anyways what they are searching")
-        else:
-            results=("","no results")        
         return results
 
     def exposed_centroid_query(self,query, args =""): 
