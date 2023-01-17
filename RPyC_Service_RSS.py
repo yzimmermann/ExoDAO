@@ -1,7 +1,6 @@
 import rpyc
 import socket
 import sys
-from fuzzywuzzy import fuzz
 import sys
 import string
 from IB import *
@@ -112,11 +111,7 @@ class SearchService(rpyc.Service):
         # this method returns all nodes with relavant centroids
         #INSERT CODE
         #code that searches all centroids in the server file system
-        if (fuzz.ratio(query,sys.argv[2])>50):
-            IP_list = self.IP_set
-        else:
-            IP_list = set([])
-        return IP_list
+        return None
 ######### CLASS DEFINITION OVER #################
 
 from rpyc.utils.server import ThreadedServer
